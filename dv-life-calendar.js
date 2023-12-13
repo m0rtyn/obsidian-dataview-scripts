@@ -36,7 +36,7 @@ function getLifeCalendarString(startDateStr, years) {
     const weekSymbol =
       isLastWeekOfYear || isLastWeekCoverNextYear
         ? '🛑'
-        : weekNum < currWeek // -4 is an WORKAROUND to align the end of the year
+        : weekNum < currWeek
           ? '✅'
           : '*️⃣'
     const weekLink =
