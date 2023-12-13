@@ -1,14 +1,17 @@
 // @ts-nocheck
-const MS_IN_DAY = 1000 * 60 * 60 * 24
-const START_DATE = '1993-01-01' 
-const CORRECTED_START_DATE = '1994-01-03' // +1 year and 2 days to a first Monday of 1994
-const NOW = new Date().getTime()
-const CUR_YEAR = new Date().getFullYear()
-const FIVE_YEARS_AGO = new Date(CUR_YEAR - 5 + "-01-01").getTime()
-const DIVIDER = "— "
+const { 
+  MS_IN_DAY,
+  START_DATE,
+  CORRECTED_START_DATE,
+  NOW,
+  CUR_YEAR,
+  FIVE_YEARS_AGO,
+  DIVIDER,
+  DASH
+} = customJS.Const
 
 /** week  */
-const dash = Math.floor((NOW - new Date(CORRECTED_START_DATE).getTime()) / MS_IN_DAY / 7)
+const dash = DASH
 
 /** month */
 const sprint = new Date().getMonth() + 1
