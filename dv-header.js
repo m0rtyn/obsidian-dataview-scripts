@@ -1,4 +1,3 @@
-// @ts-nocheck
 const { 
   MS_IN_DAY,
   START_DATE,
@@ -8,6 +7,7 @@ const {
   FIVE_YEARS_AGO,
   DIVIDER,
   DASH
+// @ts-expect-error because customJS is a Obsidian plugin
 } = customJS.Const
 
 /** week  */
@@ -35,12 +35,15 @@ const journeyProgress = Math.round(
   (NOW - FIVE_YEARS_AGO) / (new Date(`${CUR_YEAR}-12-31`).getTime() - FIVE_YEARS_AGO) * 1000
 ) / 10
 
-// const headerText = 
-// `D${dash} — S${sprintStr} (${sprintProgress}%) — M${marathon} (${marathonProgress}%) — U${CUR_YEAR} (${ultramarathonProgress}%) — J${journey} (${journeyProgress}%)`
-// dv.el('h2', headerText, { cls: "dashboard-header"})
+// @ts-expect-error because Dataview is a Obsidian plugin
 const span1 = dv.span(`D${dash}`, { cls: "dashboard-dash"})
+// @ts-expect-error
 const span2 = dv.span(`S${sprintStr} (${sprintProgress}%)`, { cls: "dashboard-sprint"})
+// @ts-expect-error
 const span3 = dv.span(`M${marathon} (${marathonProgress}%)`, { cls: "dashboard-marathon"})
+// @ts-expect-error
 const span4 = dv.span(`U${CUR_YEAR} (${ultramarathonProgress}%)`, { cls: "dashboard-ultramarathon"})
+// @ts-expect-error
 const span5 = dv.span(`J${journey} (${journeyProgress}%)`, { cls: "dashboard-journey"})
+// @ts-expect-error
 dv.el(`h2`, [span1, span2, span3, span4, span5], { cls: "dashboard-header"})
