@@ -6,7 +6,10 @@ const {
   // @ts-expect-error because customJS is a Obsidian plugin
 } = customJS.Const
 
-const WEEK_LETTER = 'D' // D for "Dash", but can be any letter
+const W_PREF = 'D' // prefix for the week link. D for "Dash", but can be any letter
+const M_PREF = 'S' // prefix for the month link. S for "Sprint".
+const Q_PREF = 'M' // prefix for the quarter link. Q for "Marathon".
+const Y_PREF = 'U' // prefix for the year link. U for "Ultramarathon".
 
 const lifeCalString = getLifeCalendarString(START_DATE, 63);
 
@@ -28,30 +31,50 @@ function getLifeCalendarString(startDateStr, years) {
 
   const result = weekArr.reduce((acc, weekNum) => {
     const currentDate = new Date(getTimestampFromWeekNumber(weekNum));
+    const fullYear = currentDate.getFullYear();
+    const lengthOfMonth = new Date(fullYear, currentDate.getMonth() + 1, 0).getDate()
+    const isLastWeekOfMonth = currentDate.getDate() >= lengthOfMonth - 6
+
     const currWeek = DASH;
 
     const isLastWeekOfYear = currentDate.getMonth() === 11 && currentDate.getDate() === 31;
     const isLastWeekCoverNextYear = currentDate.getMonth() === 0 && currentDate.getDate() <= 6;
 
-    const weekSymbol =
-      isLastWeekOfYear || isLastWeekCoverNextYear
-        ? '🛑'
-        : weekNum < currWeek
-          ? '✅'
-          : '*️⃣'
-    const weekLink =
-      isLastWeekOfYear || isLastWeekCoverNextYear
-        ? `[[${WEEK_LETTER}${weekNum}|${weekSymbol}]]\n`
-        : `[[${WEEK_LETTER}${weekNum}|${weekSymbol}]]`
+    const yearNum = String(fullYear).slice(2)
 
-    return `${acc}${weekLink}`
+    const weekSymbol = weekNum === currWeek 
+      ? '🛑'
+      : weekNum < currWeek
+        ? '✅'
+        : '*️⃣'
+    const weekLink = `[[${W_PREF}${weekNum}|${weekSymbol}]]`
+
+    const monthNum = currentDate.getMonth() + 1
+    const monthSymbol = '🌕'
+    const monthLink = isLastWeekOfMonth ? `[[${Y_PREF}${yearNum}${M_PREF}${String(monthNum).padStart(2, "0")}|${monthSymbol}]]` : ''
+
+    const quarterNum = Math.ceil((currentDate.getMonth() + 1) / 3)
+    const quarterSymbol = '🔶'
+    const quarterLink = isLastWeekOfMonth && monthNum % 3 === 0
+      ? `[[${Y_PREF}${yearNum}${Q_PREF}${String(quarterNum).padStart(2, "0")}|${quarterSymbol}]]`
+      : ''
+
+    const yearLink = isLastWeekOfYear || isLastWeekCoverNextYear
+      ? `[[${Y_PREF}${fullYear}|🟫]]`
+      : ''
+
+    console.log(currentDate.toISOString().slice(0, 10), weekNum, monthNum, quarterNum)
+    const newAcc = `${acc}${weekLink}${monthLink}${quarterLink}${yearLink}`
+    return isLastWeekOfYear || isLastWeekCoverNextYear
+      ? `${newAcc}\n`
+      : `${newAcc}`
   }, '');
 
   return result;
 }
 
 /**
- * @param {number} weekNum 
+ * @param ${number} w$eekNum 
  * @returns {number}
  */
 function getTimestampFromWeekNumber(weekNum) {
