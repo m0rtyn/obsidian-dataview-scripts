@@ -17,7 +17,7 @@ dv.paragraph(lifeCalString, { cls: "life-calendar" });
 /** 
   * @param {string} startDateStr format: yyyy-MM-dd
   * @param {number} years format: yyyy
-  * @returns {string} format: [[W1|◻️]]...[[W1052|◻️]]
+  * @returns {string} format: [[W1|◻️]]...[[W9999|◻️]]
 */
 function getLifeCalendarString(startDateStr, years) {
   const startDate = new Date(startDateStr);
@@ -31,38 +31,38 @@ function getLifeCalendarString(startDateStr, years) {
 
   const result = weekArr.reduce((acc, weekNum) => {
     const currDate = new Date(getTimestampFromWeekNumber(weekNum));
-    const fullYear = currDate.getFullYear();
-    const currMonthNum = currDate.getMonth() + 1
-    const daysInCurrMonth = new Date(fullYear, currMonthNum, 0).getDate()
-    const isLastWeekOfMonth = currDate.getDate() >= (daysInCurrMonth - 6)
     const currWeek = WEEK_NUM;
+    const currFullYear = currDate.getFullYear();
+    const currMonthNum = currDate.getMonth() + 1
+    const daysInCurrMonth = new Date(currFullYear, currMonthNum, 0).getDate()
 
+    const isLastWeekOfMonth = currDate.getDate() >= (daysInCurrMonth - 6)
     const isLastWeekOfYear = currMonthNum === 12 && currDate.getDate() === 31;
     const isLastWeekCoverNextYear = currMonthNum === 1 && currDate.getDate() <= 6;
 
-    const yearNum = String(fullYear).slice(2)
+    const yearNum = String(currFullYear).slice(2) // 2099 -> 99
 
-    const weekSymbol = weekNum === currWeek 
-      ? '🛑'
+    const weekSymbol = weekNum === currWeek
+      ? '🛑' // Current week
       : weekNum < currWeek
-        ? '✅'
-        : '*️⃣'
-    const weekLink = `[[${W_PREF}${weekNum}|${weekSymbol}]]`
+        ? '✅' // Past week
+        : '*️⃣' // Future week
+    const weekLink = `[[${W_PREF}${weekNum}|${weekSymbol}]]` // E.g. [[W9999|*️⃣]]
 
     const monthSymbol = '🌕'
-    const monthLink = isLastWeekOfMonth ? `[[${Y_PREF}${yearNum}${M_PREF}${String(currMonthNum).padStart(2, "0")}|${monthSymbol}]]` : ''
+    const monthLink = isLastWeekOfMonth ? `[[${Y_PREF}${yearNum}${M_PREF}${String(currMonthNum).padStart(2, "0")}|${monthSymbol}]]` : '' // E.g. [[Y99M12|🌕]]
 
     const quarterNum = Math.ceil(currMonthNum / 3)
     const quarterSymbol = '🔶'
     const quarterLink = isLastWeekOfMonth && currMonthNum % 3 === 0
-      ? `[[${Y_PREF}${yearNum}${Q_PREF}${String(quarterNum).padStart(2, "0")}|${quarterSymbol}]]`
+      ? `[[${Y_PREF}${yearNum}${Q_PREF}${String(quarterNum).padStart(2, "0")}|${quarterSymbol}]]` // E.g. [[Y99Q0H|🔶]]
       : ''
 
-    const yearLink = isLastWeekOfYear || isLastWeekCoverNextYear
-      ? `[[${Y_PREF}${fullYear}|🟫]]`
+    const yearLink = isLastWeekOfYear || isLastWeekCoverNextYear // E.g. [[Y2099|🟫]]
+      ? `[[${Y_PREF}${currFullYear}|🟫]]`
       : ''
 
-    const newAcc = `${acc}${weekLink}${monthLink}${quarterLink}${yearLink}`
+    const newAcc = `${acc}${weekLink}${monthLink}${quarterLink}${yearLink}` // E.g. [[W9999|*️⃣]][[Y99M12|🌕]][[Y99Q04|🔶]][[Y2099|🟫]]
     return isLastWeekOfYear || isLastWeekCoverNextYear
       ? `${newAcc}\n`
       : `${newAcc}`
