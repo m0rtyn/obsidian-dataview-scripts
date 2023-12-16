@@ -1,7 +1,7 @@
 const {
   START_DATE,
   MS_IN_WEEK,
-  DASH,
+  WEEK_NUM,
   CORRECTED_START_DATE
   // @ts-expect-error because customJS is a Obsidian plugin
 } = customJS.Const
@@ -34,8 +34,7 @@ function getLifeCalendarString(startDateStr, years) {
     const fullYear = currentDate.getFullYear();
     const lengthOfMonth = new Date(fullYear, currentDate.getMonth() + 1, 0).getDate()
     const isLastWeekOfMonth = currentDate.getDate() >= lengthOfMonth - 6
-
-    const currWeek = DASH;
+    const currWeek = WEEK_NUM;
 
     const isLastWeekOfYear = currentDate.getMonth() === 11 && currentDate.getDate() === 31;
     const isLastWeekCoverNextYear = currentDate.getMonth() === 0 && currentDate.getDate() <= 6;
@@ -74,7 +73,7 @@ function getLifeCalendarString(startDateStr, years) {
 }
 
 /**
- * @param ${number} w$eekNum 
+ * @param {number} weekNum 
  * @returns {number}
  */
 function getTimestampFromWeekNumber(weekNum) {
