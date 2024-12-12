@@ -29,6 +29,7 @@ const ultramarathonProgress = Math.round((NOW - new Date(`${CUR_YEAR}-01-01`).ge
 /** 5-years period 
  * Journey is a 5 year period which recycles every 5 years from 1993-01-01. 
  * Example of the format: J30 (30%
+ * FIXME: wrong value, wrong progress
  */
 const journey = Math.ceil((NOW - new Date(START_DATE).getTime()) / MS_IN_DAY / 365) - 1 // ?
 const journeyProgress = Math.round(
@@ -47,3 +48,48 @@ const span4 = dv.span(`U${CUR_YEAR} (${ultramarathonProgress}%)`, { cls: "dashbo
 const span5 = dv.span(`J${journey} (${journeyProgress}%)`, { cls: "dashboard-journey"})
 // @ts-expect-error
 dv.el(`h2`, [span1, span2, span3, span4, span5], { cls: "dashboard-header"})
+
+const LATITUDE = 46.096958
+const LONGITUDE = 19.657539
+const SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${LATITUDE}&lng=${LONGITUDE}&formatted=0`
+const TIME_ZONE = { timeZone: 'Europe/Belgrade' }
+const SUNSET_HEADER_CLASSES = { cls: "dashboard-header sun-clock"}
+
+window.lastSunsetFetch = { date: null, results: null}
+let lastSunsetFetchDate = window?.lastSunsetFetch.date
+const isMoreThanGapTillLastFetch = lastSunsetFetchDate && Date.now() - lastSunsetFetchDate > 120 * 60 * 1000 
+const title = `... of sun is over. ... hours left.`
+const header = dv.el(`h2`, title, SUNSET_HEADER_CLASSES)
+
+lastSunsetFetchDate === null 
+  ? fetch(SUNSET_API_URL)
+    .then(res => res.json())
+    .then(data => (renderSunset(data.results), data.results))
+    .catch(()=> renderUnknownMessage())
+    .finally((results)=> {
+      window.lastSunsetFetch = { date: Date.now(), results }
+    })
+  : isMoreThanGapTillLastFetch 
+    ? renderSunset(window.lastSunsetFetch.results)
+    : renderUnknownMessage()
+  
+function renderSunset(results) {
+  const hoursInToday = Math.round(results?.day_length / 60 / 60)
+  const localSunrise = new Date(new Date(results?.sunrise).toLocaleString('en-US', TIME_ZONE))
+  const localSunset = new Date(new Date(results?.sunset).toLocaleString('en-US', TIME_ZONE))
+  const hoursSinceSunrise = Math.round((Date.now() - localSunrise.getTime()) / 1000 / 60 / 60)
+
+  const sunnyDayProgress = Math.round(hoursSinceSunrise / hoursInToday * 1000) / 10
+  const sunnyDayHours = hoursInToday - hoursSinceSunrise
+  const isBeforeSunset = Date.now() <= localSunset.getTime()
+  const title = isBeforeSunset 
+    ? `${sunnyDayProgress}% of sun is over. ${sunnyDayHours} hours left.` 
+    : `Sunset has occured`
+
+
+  header.replaceWith(dv.el(`h2`, title, SUNSET_HEADER_CLASSES))
+}
+
+function renderUnknownMessage() {
+  header.replaceWith(dv.el(`h2`, "It seems you're offline", SUNSET_HEADER_CLASSES))
+}

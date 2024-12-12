@@ -27,7 +27,7 @@ function getLifeCalendarString(startDateStr, years) {
   const weeksAmount = Math.floor((endDate.getTime() - startDate.getTime()) / MS_IN_WEEK);
   const weekArr = new Array(weeksAmount)
     .fill(0)
-    .map((_, i) => i + 1);
+    .map((_, i) => i + 1);  
 
   const result = weekArr.reduce((acc, weekNum) => {
     const currDate = new Date(getTimestampFromWeekNumber(weekNum));
@@ -47,7 +47,9 @@ function getLifeCalendarString(startDateStr, years) {
       : weekNum < currWeek
         ? '✅' // Past week
         : '*️⃣' // Future week
-    const weekLink = `[[${W_PREF}${weekNum}|${weekSymbol}]]` // E.g. [[W9999|*️⃣]]
+    const weekLink = weekNum === currWeek 
+      ? `<span class="current-week">[[${W_PREF}${weekNum}|${weekSymbol}]]</span>`
+      : `[[${W_PREF}${weekNum}|${weekSymbol}]]` // E.g. [[W9999|*️⃣]]
 
     const monthSymbol = '🌕'
     const monthLink = isLastWeekOfMonth ? `[[${Y_PREF}${yearNum}${M_PREF}${String(currMonthNum).padStart(2, "0")}|${monthSymbol}]]` : '' // E.g. [[Y99M12|🌕]]
