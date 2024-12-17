@@ -11,7 +11,7 @@ const scheduleItems = dv.page('Log').file.tasks
   
   const date2 = dv.date("today").toFormat('yyyy-MM-dd ccc')
   const itemsByDate = getItemsByDate(date2)
-  console.log('🛑', itemsByDate, date2)
+  // console.log('🛑', itemsByDate, date2)
 
 const formatOpts = { timeStyle: 'short' }
 const formattedNow = new Intl.DateTimeFormat('en-GB', formatOpts).format(new Date())
@@ -31,11 +31,11 @@ const formattedNow = new Intl.DateTimeFormat('en-GB', formatOpts).format(new Dat
 
 // if (!isItemsAfterEmpty) {
 // dv.el('span', formattedNow, { cls: "dataview-schedule-time-separator" })
-dv.taskList(itemsByDate, false, { cls: "data-dashboard-hack" });
-return
+// dv.taskList(itemsByDate, false, { cls: "data-dashboard-hack" });
+// return
 // }
 
-dv.el('code', 'No more plans today')
+// dv.el('code', 'No more plans today')
 
 
 

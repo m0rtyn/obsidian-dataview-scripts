@@ -29,12 +29,14 @@ const ultramarathonProgress = Math.round((NOW - new Date(`${CUR_YEAR}-01-01`).ge
 /** 5-years period 
  * Journey is a 5 year period which recycles every 5 years from 1993-01-01. 
  * Example of the format: J30 (30%
- * FIXME: wrong value, wrong progress
  */
-const journey = Math.ceil((NOW - new Date(START_DATE).getTime()) / MS_IN_DAY / 365) - 1 // ?
+const ageMs = NOW - new Date(START_DATE).getTime()
+const ageYears = ageMs / MS_IN_DAY / 365 // 30, 31, 32...
+const journey = Math.ceil(ageYears/5)*5 // 30, 35...
+const CEIL = 30
 const journeyProgress = Math.round(
-  (NOW - FIVE_YEARS_AGO) / (new Date(`${CUR_YEAR}-12-31`).getTime() - FIVE_YEARS_AGO) * 1000
-) / 10
+  (ageYears-CEIL) / (journey-CEIL)
+* 100 * 10) / 10
 
 // @ts-expect-error because Dataview is a Obsidian plugin
 const span1 = dv.span(`D${dash}`, { cls: "dashboard-dash"})
