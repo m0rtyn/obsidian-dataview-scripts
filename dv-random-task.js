@@ -2,7 +2,8 @@
 const items = dv.pages("#want")
   .flatMap(p => p.file.tasks)
   .filter(t => t.tags.includes('#want'))
-  .filter(t => t.due < window.moment().add(1, 'days'))
+  // @ts-ignore
+  .filter(t => t.due < window.moment().add(3, 'days'))
   .filter(t => t.task)
   .filter(t => t.status === ' ')
   .sort(t => t.due, "desc")
