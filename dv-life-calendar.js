@@ -14,17 +14,9 @@ const moment = this.moment
 // @ts-expect-error because moment is only defined in Obsidian with Dataview plugin
 const dataview = dv
 
-// console.debug('❎❎❎❎❎❎❎❎❎❎❎❎❎❎❎❎❎❎')
-
 const TWENTY_YEARS = moment(START_DATE).add(15, 'years').format('YYYY-MM-DD')
 const FORTY_YEARS = moment(TWENTY_YEARS).add(15, 'years').format('YYYY-MM-DD')
 const LINK_TYPE_TO_SYMBOL = {
-  // currW: '🛑',
-  // pastW: '✅',
-  // futureW: '*️⃣',
-  // m: '🌕',
-  // q: '🔶',
-  // y: '🟫',
   currW: 'current-week',
   pastW: 'past-week',
   futureW: 'future-week',
@@ -85,38 +77,36 @@ function renderSquares(weekArr, row, fragment) {
 
     const isLastWeekOfMonth = currDate.getDate() >= (daysInCurrMonth - 6)
     const isFirstWeekOfMonth = currDate.getDate() <= 7
-    const isLastWeekOfYear = currMonthNum === 12 && currDate.getDate() === 31
+    const isLastWeekOfYear = currMonthNum === 12 && currDate.getDate() > 31 - 7
     const isFirstWeekOfYear = currMonthNum === 1 && currDate.getDate() <= 7
+    const isFirstWeekOfQuarter = currMonthNum % 3 === 1 && currDate.getDate() <= 7
     const isLastWeekCoverNextYear = currMonthNum === 1 && currDate.getDate() <= 6
 
     const yearNum = String(currFullYear).slice(2) // 2099 -> 99
 
     const weekType = getWeekType(weekNum, currWeek)
 
-    const weekLink = `${W_PREF}${weekNum}` // E.g. [[W9999|*️⃣]]
-    createCalNode(weekLink, weekType, row, i)
-
-    if (isLastWeekOfMonth) {
-      const monthLink = `${Y_PREF}${yearNum}${M_PREF}${String(currMonthNum).padStart(2, "0")}` // E.g. [[Y99M12|🌕]]
-      createCalNode(monthLink, 'm', row, i)
+    if (isFirstWeekOfYear) {
+      const yearLink = `${Y_PREF}${currFullYear}` // E.g. [[Y2099|🟫]]
+      createCalNode(yearLink, 'y', row, i)
     }
-
-    if (isLastWeekOfMonth && currMonthNum % 3 === 0) {
+    if (isFirstWeekOfQuarter) {
       const quarterNum = Math.ceil(currMonthNum / 3)
       const quarterLink = `${Y_PREF}${yearNum}${Q_PREF}${String(quarterNum).padStart(2, "0")}` // E.g. [[Y99Q0H|🔶]]
       createCalNode(quarterLink, 'q', row, i)
     }
-
-    if (isLastWeekOfYear || isLastWeekCoverNextYear) {
-      const yearLink = `${Y_PREF}${currFullYear}` // E.g. [[Y2099|🟫]]
-      createCalNode(yearLink, 'y', row, i)
+    if (isFirstWeekOfMonth) {
+      const monthLink = `${Y_PREF}${yearNum}${M_PREF}${String(currMonthNum).padStart(2, "0")}` // E.g. [[Y99M12|🌕]]
+      createCalNode(monthLink, 'm', row, i)
     }
 
-    if (isLastWeekOfYear || isLastWeekCoverNextYear) {
-      // setTimeout(() => fragment.appendChild(row), i * 100)
-      fragment.appendChild(row)
+    const weekLink = `${W_PREF}${weekNum}` // E.g. [[W9999|*️⃣]]
+    createCalNode(weekLink, weekType, row, i)
+
+    if (isLastWeekOfYear) {
       row = document.createElement('span')
       row.classList.add('row')
+      fragment.appendChild(row)
     }
   })
   return row
@@ -154,9 +144,7 @@ function createCalNode(link, type, fragment, i = 0) {
 
   if (type === 'y') square.dataset.yearLabel = link;
   if (type === 'q') square.dataset.quarterLabel = link.slice(3);
-  // if (type === 'currW') a.classList.add('current-week')
 
-  // setTimeout(() => fragment.appendChild(square), i)
   fragment.appendChild(square)
 }
 
